@@ -134,8 +134,7 @@ Para garantir o correto funcionamento da infraestrutura, foram realizados os seg
  └── access-switch-02.conf
 
 /docs
- ├── diagrama-logico.pdf
- └── plano-enderecamento.pdf
+ └── Projeto_Rede_Switching_Corporativa.pdf
 ```
 
 ---
