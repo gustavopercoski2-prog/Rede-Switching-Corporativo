@@ -40,17 +40,17 @@ A solução proposta utiliza segmentação lógica, hardening de camada 2 e rote
 
 ## 🛠️ 3. Planejamento e Arquitetura
 
-### 3.1. Esquema de Endereçamento (VLSM)
+### 3. Tabela de Endereçamento IPv4
 
 Foi adotado um esquema de endereçamento privado, priorizando organização, simplicidade operacional e possibilidade de expansão futura sem reestruturação do ambiente.
 
-| Departamento       | VLAN | Rede IP         | Gateway | Justificativa Técnica                |
-| ------------------ | ---- | --------------- | ------- | ------------------------------------ |
-| Administração      | 10   | 192.168.10.0/24 | .1      | Isolamento de tráfego administrativo |
-| Operacional        | 20   | 192.168.20.0/24 | .1      | Maior densidade de hosts             |
-| Servidores         | 30   | 192.168.30.0/24 | .1      | Controle de acesso restrito via ACLs |
-| Gerenciamento      | 99   | 192.168.99.0/24 | .1      | Acesso exclusivo para SSH/VTY        |
-| Native / Blackhole | 666  | —               | —       | Mitigação de VLAN Hopping            |
+| Departamento | VLAN | Rede IP | Gateway | Justificativa Técnica |
+| :--- | :--- | :--- | :--- | :--- |
+| **Diretoria** | 10 | 192.168.10.0/24 | 192.168.10.1 | Isolamento de tráfego administrativo |
+| **Vendas** | 20 | 192.168.20.0/24 | 192.168.20.1 | Maior densidade de hosts operacionais |
+| **Servidores** | 30 | 192.168.30.0/24 | 192.168.30.1 | Controle de acesso restrito via ACLs |
+| **Gestao** | 99 | 192.168.99.0/24 | 192.168.99.1 | Acesso exclusivo para SSH/VTY e gerência |
+| **Blackhole** | 666 | — | — | Segurança: Mitigação de VLAN Hopping |
 
 ---
 
