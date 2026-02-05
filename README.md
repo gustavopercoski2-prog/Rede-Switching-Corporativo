@@ -8,23 +8,16 @@
 
 Este projeto apresenta a implementação de uma rede local (LAN) corporativa simulada no **Cisco Packet Tracer**, com foco na aplicação prática dos conceitos abordados no currículo da certificação **CompTIA Network+ (N10-009)**.
 
-O cenário simula a modernização de uma infraestrutura legada, abordando problemas comuns encontrados em ambientes corporativos, como:
-
-* Domínios de broadcast excessivos
-* Falta de segmentação entre departamentos
-* Ausência de políticas básicas de segurança em portas de acesso
-* Dependência de topologias sem redundância no backbone
-
-A solução proposta utiliza segmentação lógica, hardening de camada 2 e roteamento centralizado em Layer 3 para criar um ambiente **mais seguro, escalável e resiliente**.
+O cenário simula a modernização de uma infraestrutura legada, corrigindo falhas como domínios de broadcast excessivos, falta de segmentação e vulnerabilidades de acesso físico.
 
 ---
 
 ## 🎯 2. Objetivos de Engenharia
 
-* **Segmentação Lógica (VLANs)**: Isolar departamentos para reduzir broadcast, melhorar desempenho e proteger dados sensíveis.
-* **Segurança de Camada 2**: Aplicar políticas de hardening em portas de acesso para mitigar conexões não autorizadas.
-* **Resiliência da Topologia**: Implementar Spanning Tree Protocol (STP) com definição manual de Root Bridge para evitar loops.
-* **Roteamento Inter-VLAN (Layer 3)**: Centralizar o tráfego em um switch multilayer, reduzindo latência.
+* **Segmentação Lógica (VLANs)**: Isolar departamentos para melhorar o desempenho e proteger dados.
+* **Segurança de Camada 2**: Aplicar travas nas portas de acesso para impedir conexões não autorizadas.
+* **Resiliência da Topologia**: Configurar o Spanning Tree Protocol (STP) para evitar loops na rede.
+* **Roteamento Inter-VLAN (Layer 3)**: Centralizar o tráfego em um switch de alta performance para reduzir a latência.
 
 ---
 
@@ -32,67 +25,51 @@ A solução proposta utiliza segmentação lógica, hardening de camada 2 e rote
 
 ### 3.1. Tabela de Endereçamento IPv4
 
-Foi adotado um esquema de endereçamento privado, priorizando organização e escalabilidade.
-
 | Departamento | VLAN | Rede IP | Gateway | Justificativa Técnica |
 | :--- | :--- | :--- | :--- | :--- |
-| **Diretoria** | 10 | 192.168.10.0/24 | 192.168.10.1 | Isolamento de tráfego administrativo |
-| **Vendas** | 20 | 192.168.20.0/24 | 192.168.20.1 | Maior densidade de hosts operacionais |
-| **Servidores** | 30 | 192.168.30.0/24 | 192.168.30.1 | Controle de acesso restrito via ACLs |
-| **Gestao** | 99 | 192.168.99.0/24 | 192.168.99.1 | Acesso exclusivo para SSH/VTY e gerência |
-| **Blackhole** | 666 | — | — | Segurança: Mitigação de VLAN Hopping |
+| **Diretoria** | 10 | 192.168.10.0/24 | 192.168.10.1 | Isolamento administrativo |
+| **Vendas** | 20 | 192.168.20.0/24 | 192.168.20.1 | Alta densidade de usuários |
+| **Servidores** | 30 | 192.168.30.0/24 | 192.168.30.1 | Controle de acesso restrito |
+| **Gestao** | 99 | 192.168.99.0/24 | 192.168.99.1 | Gerenciamento exclusivo |
+| **Blackhole** | 666 | — | — | Mitigação de ataques |
 
 ---
 
-## 🏗️ 3.2. Arquitetura da Topologia
+### 3.2. Arquitetura da Topologia
 
-A topologia segue o **modelo hierárquico**, separando funções de acesso e core para melhor desempenho e organização lógica.
+Abaixo está o mapa visual da rede. Ele demonstra como os computadores dos departamentos estão organizados e conectados aos switches de acesso, que por sua vez se comunicam com o núcleo central (Switch Core) para acessar outras redes e a internet.
 
+> **Mapa da Rede:** Representação visual da estrutura hierárquica e conexões entre os setores.
 <img src="https://github.com/user-attachments/assets/2884d9c7-6527-4663-8627-78b786946065" alt="Diagrama da Topologia" width="800">
-
-**Componentes utilizados:**
-
-* 01 Router (Edge): Simulação de acesso à WAN.
-* 01 Switch Multilayer (Core): Roteamento Inter-VLAN e Root Bridge do STP.
-* 02 Switches de Acesso: Conexão dos dispositivos finais.
 
 ---
 
 ## ⚙️ 4. Implementação Técnica
 
 ### 4.1. Switching — Camada 2
-
-As configurações de acesso seguem o **princípio do menor privilégio**:
-
-* **Port Security**: Modo *sticky* habilitado; Apenas um endereço MAC permitido; Em caso de violação, estado `shutdown`.
-* **Trunking (802.1Q)**: VLANs permitidas explicitamente; VLAN nativa definida como VLAN 666 (blackhole).
-
----
+As portas de acesso foram configuradas para aceitar apenas dispositivos autorizados (Port-Security). Também foram implementados links **Trunk** para permitir que o tráfego de múltiplas VLANs trafegue entre os switches com segurança.
 
 ### 4.2. Inteligência de Rede — Camada 3
+O **Switch Core** atua como o ponto central de inteligência, realizando o roteamento entre os departamentos através de interfaces virtuais (SVIs).
 
-O switch multilayer atua como o núcleo lógico da rede:
-
-* **SVIs (Switch Virtual Interfaces)**: Criadas para cada VLAN, permitindo comunicação interdepartamental controlada.
-
-<img src="https://github.com/user-attachments/assets/182cbc72-38ca-496f-b5ad-5a49159c662c" alt="Configuração de VLANs no Switch Core" width="600">
-
-* **Spanning Tree Protocol (STP)**: Prioridade ajustada manualmente para garantir o Core como Root Bridge.
+> **Configuração de VLANs:** O terminal abaixo confirma que as redes de cada departamento foram criadas e estão operando corretamente no núcleo da rede.
+<img src="https://github.com/user-attachments/assets/182cbc72-38ca-496f-b5ad-5a49159c662c" alt="Configuração de VLANs no Switch Core" width="800">
 
 ---
 
 ## 🧪 5. Validação do Ambiente
 
-Para garantir o correto funcionamento da infraestrutura, foram realizados os seguintes testes práticos:
+### 5.1. Teste de Segurança (Port-Security)
+Para validar a proteção, simulamos a conexão de um dispositivo invasor. O switch detectou que o endereço MAC não pertencia à rede autorizada e desativou a porta imediatamente.
 
-* **Isolamento de Broadcast**: Confirmação de que ARP e DHCP permanecem restritos às suas respectivas VLANs.
-* **Teste de Intrusão Física**: Conexão de dispositivo não autorizado resultou no bloqueio imediato via Port Security.
+> **Flagrante de Bloqueio:** À esquerda, o invasor impedido de se comunicar; à direita, o console do Switch mostrando o status de segurança ativado.
+<img src="https://github.com/user-attachments/assets/f71fd54f-9560-4230-8757-698ad63e411a" alt="Evidencia Port-Security" width="800">
 
-<img src="https://github.com/user-attachments/assets/f71fd54f-9560-4230-8757-698ad63e411a" alt="Evidencia Port-Security" width="600">
+### 5.2. Teste de Conectividade (Ping/Tracert)
+Este teste comprova que a segmentação não impede o trabalho: os departamentos conseguem alcançar os servidores e o gateway de forma estável, passando pelo roteamento de Camada 3.
 
-* **Conectividade Inter-VLAN**: Testes de `ping` e `tracert` bem-sucedidos entre usuários e servidores, validando o roteamento Layer 3.
-
-<img src="https://github.com/user-attachments/assets/c425b349-ac7e-467f-ac1c-fa9cd4fe71a7" alt="Evidencia de conectividade" widht="600">
+> **Caminho dos Dados:** O teste demonstra o sucesso do sinal trafegando entre as sub-redes da empresa sem perdas.
+<img src="https://github.com/user-attachments/assets/c425b349-ac7e-467f-ac1c-fa9cd4fe71a7" alt="Evidencia de conectividade" width="800">
 
 ---
 
