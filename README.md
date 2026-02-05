@@ -1,6 +1,3 @@
-
----
-
 # 🏢 Infraestrutura de Rede Corporativa: Segmentação e Segurança L2/L3
 
 **Laboratório de Aplicação Prática — Baseado no currículo CompTIA Network+ (N10-009)**
@@ -24,25 +21,18 @@ A solução proposta utiliza segmentação lógica, hardening de camada 2 e rote
 
 ## 🎯 2. Objetivos de Engenharia
 
-* **Segmentação Lógica (VLANs)**
-  Isolar departamentos para reduzir broadcast, melhorar desempenho e proteger dados sensíveis.
-
-* **Segurança de Camada 2**
-  Aplicar políticas de hardening em portas de acesso para mitigar conexões não autorizadas.
-
-* **Resiliência da Topologia**
-  Implementar Spanning Tree Protocol (STP) com definição manual de Root Bridge para evitar loops e garantir convergência otimizada.
-
-* **Roteamento Inter-VLAN (Layer 3)**
-  Centralizar o tráfego em um switch multilayer, reduzindo latência e eliminando a necessidade de Router-on-a-Stick.
+* **Segmentação Lógica (VLANs)**: Isolar departamentos para reduzir broadcast, melhorar desempenho e proteger dados sensíveis.
+* **Segurança de Camada 2**: Aplicar políticas de hardening em portas de acesso para mitigar conexões não autorizadas.
+* **Resiliência da Topologia**: Implementar Spanning Tree Protocol (STP) com definição manual de Root Bridge para evitar loops.
+* **Roteamento Inter-VLAN (Layer 3)**: Centralizar o tráfego em um switch multilayer, reduzindo latência.
 
 ---
 
 ## 🛠️ 3. Planejamento e Arquitetura
 
-### 3. Tabela de Endereçamento IPv4
+### 3.1. Tabela de Endereçamento IPv4
 
-Foi adotado um esquema de endereçamento privado, priorizando organização, simplicidade operacional e possibilidade de expansão futura sem reestruturação do ambiente.
+Foi adotado um esquema de endereçamento privado, priorizando organização e escalabilidade.
 
 | Departamento | VLAN | Rede IP | Gateway | Justificativa Técnica |
 | :--- | :--- | :--- | :--- | :--- |
@@ -58,18 +48,13 @@ Foi adotado um esquema de endereçamento privado, priorizando organização, sim
 
 A topologia segue o **modelo hierárquico**, separando funções de acesso e core para melhor desempenho e organização lógica.
 
+<img src="https://github.com/user-attachments/assets/2884d9c7-6527-4663-8627-78b786946065" alt="Diagrama da Topologia" width="800">
+
 **Componentes utilizados:**
 
-* 01 Router (Edge): Simulação de acesso à WAN
-* 01 Switch Multilayer (Core):
-
-  * Roteamento Inter-VLAN
-  * Root Bridge do STP
-* 02 Switches de Acesso:
-
-  * Conexão dos dispositivos finais
-
-📌 *O diagrama lógico da topologia pode ser encontrado na pasta `/docs`.*
+* 01 Router (Edge): Simulação de acesso à WAN.
+* 01 Switch Multilayer (Core): Roteamento Inter-VLAN e Root Bridge do STP.
+* 02 Switches de Acesso: Conexão dos dispositivos finais.
 
 ---
 
@@ -79,17 +64,8 @@ A topologia segue o **modelo hierárquico**, separando funções de acesso e cor
 
 As configurações de acesso seguem o **princípio do menor privilégio**:
 
-* **Port Security**
-
-  * Modo *sticky* habilitado
-  * Apenas um endereço MAC permitido por porta
-  * Em caso de violação, a interface entra em estado `error-disabled`
-
-* **Trunking (802.1Q)**
-
-  * VLANs permitidas explicitamente nos links trunk
-  * VLAN nativa definida como VLAN 666 (blackhole)
-  * Redução de risco de ataques de VLAN Hopping
+* **Port Security**: Modo *sticky* habilitado; Apenas um endereço MAC permitido; Em caso de violação, estado `shutdown`.
+* **Trunking (802.1Q)**: VLANs permitidas explicitamente; VLAN nativa definida como VLAN 666 (blackhole).
 
 ---
 
@@ -97,13 +73,11 @@ As configurações de acesso seguem o **princípio do menor privilégio**:
 
 O switch multilayer atua como o núcleo lógico da rede:
 
-* **SVIs (Switch Virtual Interfaces)**
-  Criadas para cada VLAN, permitindo comunicação interdepartamental controlada.
+* **SVIs (Switch Virtual Interfaces)**: Criadas para cada VLAN, permitindo comunicação interdepartamental controlada.
 
-* **Spanning Tree Protocol (STP)**
+<img src="https://github.com/user-attachments/assets/182cbc72-38ca-496f-b5ad-5a49159c662c" alt="Configuração de VLANs no Switch Core" width="600">
 
-  * Prioridade ajustada manualmente para garantir o Core como Root Bridge
-  * Prevenção de caminhos subótimos e loops de camada 2
+* **Spanning Tree Protocol (STP)**: Prioridade ajustada manualmente para garantir o Core como Root Bridge.
 
 ---
 
@@ -111,14 +85,14 @@ O switch multilayer atua como o núcleo lógico da rede:
 
 Para garantir o correto funcionamento da infraestrutura, foram realizados os seguintes testes práticos:
 
-* **Isolamento de Broadcast**
-  Confirmação de que ARP e DHCP permanecem restritos às suas respectivas VLANs.
+* **Isolamento de Broadcast**: Confirmação de que ARP e DHCP permanecem restritos às suas respectivas VLANs.
+* **Teste de Intrusão Física**: Conexão de dispositivo não autorizado resultou no bloqueio imediato via Port Security.
 
-* **Teste de Intrusão Física**
-  Conexão de dispositivo não autorizado em porta de acesso resultou no bloqueio imediato via Port Security.
+<img src="https://github.com/user-attachments/assets/f71fd54f-9560-4230-8757-698ad63e411a" alt="Evidencia Port-Security" width="600">
 
-* **Conectividade Inter-VLAN**
-  Testes de `ping` e `tracert` bem-sucedidos entre usuários e servidores, validando o roteamento Layer 3.
+* **Conectividade Inter-VLAN**: Testes de `ping` e `tracert` bem-sucedidos entre usuários e servidores, validando o roteamento Layer 3.
+
+<img src="https://github.com/user-attachments/assets/c425b349-ac7e-467f-ac1c-fa9cd4fe71a7" alt="Evidencia de conectividade" widht="600">
 
 ---
 
